@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         LeetCode Session Helper
-// @namespace    https://github.com/titlis
+// @namespace    https://github.com/titlis/leetcode-session-helper
 // @version      1.0
 // @description  Create a dropdown to allow user to switch between sessions and enforce the selected user session on the client side.
 // @author       titlis
