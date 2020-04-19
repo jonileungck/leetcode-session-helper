@@ -8,6 +8,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @require      http://code.jquery.com/jquery-latest.js
+// @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // ==/UserScript==
 
 (function() {
@@ -62,50 +63,11 @@
         location.href = location.href;
     }
 
-    var waitForPageLoaded = function(callback) {
-        var submitButton = $("[class^=submit]");
-        if (submitButton == null || submitButton.length == 0) {
-            console.log("could not find the submit button, try again in 2 seconds");
-            setTimeout(function(){waitForPageLoaded(callback)}, 2000);
-            return;
-        }
-        if (callback) callback();
-    }
-
-    var pageLoadedCallBack = function() {
-        replaceSubmitButton();
-        listenOnSubmitButtonChange();
-    }
-
-    var listenOnSubmitButtonChange = function() {
-        var submitButton = $("[class^=submit]");
-
-        MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-        var observer = new MutationObserver(function(mutations, observer) {
-            mutations.forEach(function(mutation) {
-                if (mutation.addedNodes.length > 0) {
-                    var classString = mutation.addedNodes[0].className;
-                    if (classString.includes("submit") && !classString.includes("custom-button")) {
-                        replaceSubmitButton();
-                    }
-                } else if (mutation.removedNodes.length > 0) {
-                    var classString = mutation.removedNodes[0].className;
-                    if (classString.includes("submit") && !classString.includes("custom-button")) {
-                        $("[class^=submit]").remove();
-                    }
-                }
-            });
-        });
-
-        observer.observe(submitButton.parent()[0], {
-            childList: true
-        });
-    }
-
     var replaceSubmitButton = async function() {
         var submitButton = $("[class^=submit]");
+        submitButton.addClass("lsm-processed");
         var customButton = submitButton.clone();
-        customButton.addClass("custom-button");
+        customButton.addClass("lsm-processed");
         customButton.unbind();
         customButton.click(function() {
             getSessions(async function(sessions) {
@@ -121,6 +83,9 @@
             });
         });
         customButton.appendTo(submitButton.parent());
+        submitButton.on('DOMNodeRemoved', function(e) {
+            customButton.remove();
+        });
         submitButton.hide();
     }
 
@@ -160,7 +125,8 @@
         setSelectedSessionIfNotActive(sessions);
         createDropdown(sessions);
         if (isProblemPage(location.href)) {
-            waitForPageLoaded(pageLoadedCallBack);
+            //waitForPageLoaded(pageLoadedCallBack);
+            waitForKeyElements("[class^=submit]:not(.lsm-processed)", replaceSubmitButton);
         }
     }
 
