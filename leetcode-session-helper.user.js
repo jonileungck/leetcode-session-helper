@@ -103,10 +103,11 @@
         var selected_session = await GM_getValue("leetcode_selected_session", getActiveSession(sessions));
         for (var i = 0; i < sessions.length; i++) {
             var session_name = sessions[i]['name'];
+            var session_ac_num = sessions[i]['ac_questions'];
             if (session_name == "") {
                 session_name = "Anonymous Session";
             }
-            select.append('<option id="' + sessions[i]['id'] + '" value="' + sessions[i]['id'] + '">' + session_name + '</option>');
+            select.append('<option id="' + sessions[i]['id'] + '" value="' + sessions[i]['id'] + '">' + session_name + ' (' + session_ac_num + ')' + '</option>');
         }
         var selected_option = select.find('option#' + selected_session);
         selected_option.prop('selected', true);
